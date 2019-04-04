@@ -1,0 +1,15 @@
+virtual: true
+
+problems:
+  1:
+    status: AC
+  2:
+    status: AC
+  3:
+    status: AC
+  4:
+    status: editorial
+  5:
+    status: AC
+  6:
+    status: editorial
