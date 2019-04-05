@@ -1,0 +1,13 @@
+---
+virtual: true
+gcj: true
+
+problems:
+  1:
+    status: AC
+  2:
+    status: AC
+  3:
+    status: AC
+  4:
+    status: WA
