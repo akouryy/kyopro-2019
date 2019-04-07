@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+/gcj/2019q/testing_tool.py
+*.err.txt
+*.in.txt
