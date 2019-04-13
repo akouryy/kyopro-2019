@@ -1,0 +1,11 @@
+---
+virtual: false
+gcj: true
+problems:
+- status: ac
+  time: 1h 31m
+- status: ac
+  time: 54m
+- status: ac
+  time: 2h 9m
+  fail_count: 1
