@@ -35,3 +35,4 @@
 /gcj/2019q/testing_tool.py
 *.err.txt
 *.in.txt
+*.code-workspace
