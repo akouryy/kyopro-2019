@@ -1,4 +1,3 @@
-#define MOD 998244353
 /*? begin "base.hpp" */
 #ifndef __clang__
 #pragma GCC optimize ("O3")
@@ -53,7 +52,10 @@ using ULL=unsigned long long;
 #define downtil(f,t,i) for(int rabT##i=(t),i=(f);i> rabT##i;i--)
 #define iter(v) begin(v),end(v)
 #define citer(v) cbegin(v),cend(v)
-#define BINOP_ASGN(t,op) t operator op(CS t&o)CS{RT t(*this)op##=o;}
+#define riter(v) rbegin(v),rend(v)
+#define criter(v) crbegin(v),crend(v)
+#define IF(a,b,c) ((a)?(b):(c))
+#define BINOP_ASGN(t,u,op) t operator op(CS u&o)CS{RT t(*this)op##=o;}
 #if debug
  #define _GLIBCXX_DEBUG
  #define _LIBCPP_DEBUG 2
@@ -90,7 +92,7 @@ public:
   MInt&operator-=(CS MInt&m){val-=m.val;if(val<0)val+=mod;RT*this;}
   MInt&operator*=(CS MInt&m){val=val*m.val%mod;RT*this;}
   MInt&operator/=(CS MInt&m){val=val*m.inv().val%mod;RT*this;}
-  BINOP_ASGN(MInt,+) BINOP_ASGN(MInt,-) BINOP_ASGN(MInt,*) BINOP_ASGN(MInt,/)
+  BINOP_ASGN(MInt,MInt,+) BINOP_ASGN(MInt,MInt,-) BINOP_ASGN(MInt,MInt,*) BINOP_ASGN(MInt,MInt,/)
   MInt operator-()CS{MInt m;m.val=val?mod-val:0;RT m;}
   bool operator==(CS MInt&m)CS{RT val==m.val;}
   bool operator!=(CS MInt&m)CS{RT val!=m.val;}
@@ -120,7 +122,7 @@ TL<TN T>using vvvec=vec<vvec<T>>;
 TL<TN T>using vvvvec=vec<vvvec<T>>;
 
 //#pragma rab typedefs.dynamic
-using WI = vvec<int>; using VI = vec<int>; using VM = vec<mint>; 
+using WI = vvec<int>; using VI = vec<int>; using PII = pair<int, int>; 
 /*? end "typedefs.hpp" */
 /*? begin "alias.hpp" */
 #define PB push_back
@@ -140,7 +142,7 @@ TL<TN T>IL bool amin(T&v,CS T&a){RT v>a&&(v=a,true);}
  TL<TN T>IL CX CS T&clamp(CS T&a,CS T&mn,CS T&mx){RT a<mn?mn:a>mx?mx:a;}
 #endif
 
-TL<TN T>int size_RAB(T t){RT t.size();}
+TL<TN T>IL int size_RAB(T t){RT t.size();}
 #define size size_RAB
 
 TL<TN V>IL void uniq_after_sort(V&v){v.erase(unique(iter(v)),v.end());}
@@ -162,7 +164,13 @@ TL<TN V>IL auto flatten(CS V&xss,int reserve_size=0)->TN V::value_type{
 
 TL<TN I>IL bool is_in(I x,I l,I r){RT l<=x&&x<r;}
 
-TL<TN T>IL T fetch(const vec<T>&v,int i,T d){RT is_in(i,0,size(v))?v[i]:d;}
+TL<TN T>IL T fetch(CS T&d,CS vec<T>&v,int i){RT 0<=i&&i<size(v)?v[i]:d;}
+TL<TN T>IL T fetch(CS T&d,CS vvec<T>&v,int i,int j){
+  RT 0<=i&&i<size(v)&&0<=j&&j<size(v[i])?v[i][j]:d;
+}
+// TL<TN T,TN U,TN...I>IL T fetch(CS T&d,CS vec<vec<U>>&v,int i,I...j){
+// RT 0<=i&&i<size(v)?fetch(d,v[i],j...):d;
+// }
 TL<TN T>struct Compressed{int size;map<T,int>zip;vec<T>unzip;};
 TL<TN T>IL Compressed<T>compressed(vec<T>v){
   sort_and_uniq(v);map<T,int>zip;times(size(v),i)zip[v[i]]=i;RT{size(v),zip,move(v)};
@@ -210,88 +218,89 @@ signed main(){
  return 0;
 }
 /*? end "base.hpp" */
-/*? begin "nck.hpp" */
-/*? begin "fact.hpp" */
-
-/*! https://twitter.com/meguru_comp/status/694207919517077504 */
-VM fact, fact_inv;
-inline void fact_init(int n) {
-  int a = size(fact);
-  if(a > n) return;
-  fact.resize(n+1);
-  fact_inv.resize(n+1);
-  if(a == 0) {
-    fact[a] = fact_inv[a] = mint(1);
-    ++a;
-  }
-  upto(a, n, i) fact[i] = fact[i-1] * mint(i);
-  fact_inv[n] = fact[n].inv();
-  downto(n-1, a, i) fact_inv[i] = fact_inv[i+1] * mint(i+1);
+/*? begin "snake.hpp" */
+/*!https://www.learning-algorithms.com/entry/2017/12/12/153419*/
+IL void snake_zigzag_number_to_pos(int h,int w,int s,int&i,int&j){
+i=s/w;j=IF(i%2==0,s%w,w-1-s%w);
 }
-/*? end "fact.hpp" */
-
-/*! https://twitter.com/meguru_comp/status/694547019885449216 */
-inline mint nCk(int n, int k, bool check_init = true) {
-  if(check_init && size(fact) <= n) fact_init(n);
-  if(0 <= k && k <= n) return fact[n] * fact_inv[k] * fact_inv[n-k];
-  else return mint(0);
+IL PII snake_zigzag_number_to_pos(int h,int w,int s){PII p;snake_zigzag_number_to_pos(h,w,s,p.first,p.second);RT p;
 }
-inline mint nPk(int n, int k, bool check_init = true) {
-  if(check_init && size(fact) <= n) fact_init(n);
-  if(0 <= k && k <= n) return fact[n] * fact_inv[n-k];
-  else return mint(0);
+IL int snake_zigzag_pos_to_number(int h,int w,int i,int j){RT i*w+IF(i%2==0,j,w-1-j);
 }
-/*? end "nck.hpp" */
-//#include "consts.hpp"
-
-mint dp[6001][3001];
+IL void snake_cycle_number_to_pos(int h,int w,int s,int&i,int&j){
+assert(h%2==0||w%2==0);bool swp=h%2;if(swp)swap(h,w);if(s==0){i=j=0;
+}else if(s<=h*(w-1)){snake_zigzag_number_to_pos(h,w-1,s-1,i,j);
+++j;}else{i=h*w-s;j=0;
+}
+if(swp)swap(i,j);
+}
+IL PII snake_cycle_number_to_pos(int h,int w,int s){PII p;snake_cycle_number_to_pos(h,w,s,p.first,p.second);RT p;
+}
+IL int snake_cycle_pos_to_number(int h,int w,int i,int j){assert(h%2==0||w%2==0);
+if(h%2==1){swap(h,w);swap(i,j);
+}
+if(j==0){RT IF(i==0,0,h*w-i);}else{RT snake_zigzag_pos_to_number(h,w-1,i,j-1)+1;
+}}
+IL void snake_spath_number_to_pos(int h,int w,int i0,int j0,int s,int&i,int&j){
+if(h&w&1){assert(i0%2==j0%2);if(i0%2==0){bool swp=i0==0;if(swp){swap(h,w);swap(i0,j0);swap(i,j);
+}
+int a0=(h-i0)*(w-j0-1),a1=h-i0,a2=i0*(w-j0);if(s<a0){snake_zigzag_number_to_pos(h-i0,w-j0-1,s,i,j);
+i+=i0;j+=j0;}else if(s<a0+a1){i=h-1-(s-a0);j=w-1;
+}else if(s<a0+a1+a2){snake_zigzag_number_to_pos(w-j0,i0,s-a0-a1,j,i);
+i=i0-1-i;j=w-1-j;}else{snake_zigzag_number_to_pos(h,j0,s-a0-a1-a2,i,j);
+j=j0-1-j;
+}
+if(swp)swap(i,j);}else{int a0=(h-i0)*(w-j0),a1=j0,a2=(h-1)*j0;
+if(s<a0){snake_zigzag_number_to_pos(h-i0,w-j0,s,i,j);i+=i0;j+=j0;
+}else if(s<a0+a1){i=h-1;j=j0-1-(s-a0);
+}else if(s<a0+a1+a2){snake_zigzag_number_to_pos(j0,h-1,s-a0-a1,j,i);
+i=h-2-i;}else{snake_zigzag_number_to_pos(i0,w-j0,s-a0-a1-a2,i,j);
+j+=j0;
+}}}else{
+snake_cycle_number_to_pos(
+h,w,(s+snake_cycle_pos_to_number(h,w,i0,j0))%(h*w),
+i,j
+);
+}}
+IL PII snake_spath_number_to_pos(int h,int w,int i0,int j0,int s){
+PII p;snake_spath_number_to_pos(h,w,i0,j0,s,p.first,p.second);
+RT p;
+}
+IL int snake_spath_pos_to_number(int h,int w,int i0,int j0,int i,int j){
+if(h&w&1){assert(i0%2==j0%2);if(i0%2==0){if(i0==0){swap(h,w);
+swap(i0,j0);swap(i,j);
+}
+int a0=(h-i0)*(w-j0-1),a1=h-i0,a2=i0*(w-j0);
+if(j<j0){RT a0+a1+a2+snake_zigzag_pos_to_number(h,j0,i,j0-1-j);
+}else if(i<i0){RT a0+a1+snake_zigzag_pos_to_number(w-j0,i0,w-1-j,i0-1-i);
+}else if(j==w-1){RT a0+(h-1-i);}else{RT snake_zigzag_pos_to_number(h-i0,w-j0-1,i-i0,j-j0);
+}}else{int a0=(h-i0)*(w-j0),a1=j0,a2=(h-1)*j0;if(j<j0){if(i==h-1){RT a0+(j0-1-j);
+}else{RT a0+a1+snake_zigzag_pos_to_number(j0,h-1,j,h-2-i);
+}}else{
+if(i<i0){RT a0+a1+a2+snake_zigzag_pos_to_number(i0,w-j0,i,j-j0);
+}else{RT snake_zigzag_pos_to_number(h-i0,w-j0,i-i0,j-j0);
+}}}}else{
+RT modulo(
+snake_cycle_pos_to_number(h,w,i,j)-snake_cycle_pos_to_number(h,w,i0,j0),
+h*w
+);
+}}
+/*? end "snake.hpp" */
 
 void solve() {
-// N X
+// HWNN(A)
 /* <foxy.memo-area> */
-int N;int X;cin>>N;cin>>X;
+int H;int W;int N;cin>>H;cin>>W;cin>>N;VI A(N);times(N,Ri_0){cin>>A[Ri_0];}
 /* </foxy.memo-area> */
 
-  dp[0][0] = mint(1);
+  WI ans(H, VI(W));
 
-  VM anss(N + 1);
-
-  times(N, i) {
-    times(X, j) {
-      dp[j + 1][i + 1] += dp[j][i];
-
-      if(j + 2 <= X) dp[j + 2][i + 1] += dp[j][i];
-    }
+  int s = 0;
+  times(N, i) times(A[i], o) {
+    PII p = snake_zigzag_number_to_pos(H, W, s);
+    ans[p.first][p.second] = i + 1;
+    ++s;
   }
-
-  // dd dp;
-
-  // mint ans1 = 0_m, ans2 = 0_m;
-  upto(0, N, i) {
-    times(X, j) {
-      anss[i] += dp[j][i];
-    }
-  }
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  anss: "<<(anss)ln<<"  '?':  "<<('?')ln;}
-  upto(1, min(N / 2, (X - 1) / 2), a) {
-    // dd a;
-    upto(0, N - 2 * a, k) {
-      // dd k; X - 1 - 2 * a; (N - 2 * a) - k; dp[X - 1 - 2 * a][(N - 2 * a) - k];
-      anss[N - k] += dp[X - 1 - 2 * a][(N - 2 * a) - k];
-    }
-  }
-
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  anss: "<<(anss)ln<<"  '*':  "<<('*')ln;}
-  if(X % 2 == 1 && N > (X - 1)) {
-    upto(1, N - (X - 1), t) {
-      anss[X - 1 + t] += 1_m; // 22...22
-    }
-  }
-
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  anss: "<<(anss)ln<<"  '!':  "<<('!')ln;}
-  mint ans = 0_m;
-  fact_init(N);
-  times(N + 1, k) ans += anss[k] * nCk(N, k);
 
   cout << ans ln;
 }

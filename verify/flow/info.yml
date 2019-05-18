@@ -1,0 +1,29 @@
+---
+virtual: false
+gcj: false
+url: https://qiita.com/drken/items/2f56925972c1d34e05d8#3-5-%E6%B0%B4%E3%82%92%E6%B5%81%E3%81%97%E3%81%A6%E8%A7%A3%E3%81%8F-%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC
+problems:
+- status: ac
+  url:
+    - http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_6_A&lang=jp
+    - http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3577769
+- status: ac
+  url:
+    - https://yukicoder.me/problems/no/654
+    - https://yukicoder.me/submissions/347471
+- status: ac
+  url:
+    - https://atcoder.jp/contests/abc010/tasks/abc010_4
+    - https://atcoder.jp/contests/abc010/submissions/5432656
+- status: ac
+  url:
+    - https://atcoder.jp/contests/arc074/tasks/arc074_d
+    - https://atcoder.jp/contests/arc074/submissions/5432661
+- status: ac
+  url:
+    - https://atcoder.jp/contests/kupc2016/tasks/kupc2016_e
+    - https://atcoder.jp/contests/kupc2016/submissions/5432589
+- status: ac
+  url:
+    - http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_7_A
+    - http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3577828

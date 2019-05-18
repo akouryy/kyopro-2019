@@ -1,4 +1,3 @@
-#define MOD 998244353
 /*? begin "base.hpp" */
 #ifndef __clang__
 #pragma GCC optimize ("O3")
@@ -41,6 +40,7 @@ using ULL=unsigned long long;
 #define CS const
 #define CX constexpr
 #define IL inline
+#define OP operator
 #define RT return
 #define TL template
 #define TN typename
@@ -53,7 +53,10 @@ using ULL=unsigned long long;
 #define downtil(f,t,i) for(int rabT##i=(t),i=(f);i> rabT##i;i--)
 #define iter(v) begin(v),end(v)
 #define citer(v) cbegin(v),cend(v)
-#define BINOP_ASGN(t,op) t operator op(CS t&o)CS{RT t(*this)op##=o;}
+#define riter(v) rbegin(v),rend(v)
+#define criter(v) crbegin(v),crend(v)
+#define IF(a,b,c) ((a)?(b):(c))
+#define BINOP_ASGN(t,u,op) t operator op(CS u&o)CS{RT t(*this)op##=o;}
 #if debug
  #define _GLIBCXX_DEBUG
  #define _LIBCPP_DEBUG 2
@@ -90,7 +93,7 @@ public:
   MInt&operator-=(CS MInt&m){val-=m.val;if(val<0)val+=mod;RT*this;}
   MInt&operator*=(CS MInt&m){val=val*m.val%mod;RT*this;}
   MInt&operator/=(CS MInt&m){val=val*m.inv().val%mod;RT*this;}
-  BINOP_ASGN(MInt,+) BINOP_ASGN(MInt,-) BINOP_ASGN(MInt,*) BINOP_ASGN(MInt,/)
+  BINOP_ASGN(MInt,MInt,+) BINOP_ASGN(MInt,MInt,-) BINOP_ASGN(MInt,MInt,*) BINOP_ASGN(MInt,MInt,/)
   MInt operator-()CS{MInt m;m.val=val?mod-val:0;RT m;}
   bool operator==(CS MInt&m)CS{RT val==m.val;}
   bool operator!=(CS MInt&m)CS{RT val!=m.val;}
@@ -120,9 +123,10 @@ TL<TN T>using vvvec=vec<vvec<T>>;
 TL<TN T>using vvvvec=vec<vvvec<T>>;
 
 //#pragma rab typedefs.dynamic
-using WI = vvec<int>; using VI = vec<int>; using VM = vec<mint>; 
+using WI = vvec<int>; using VI = vec<int>; 
 /*? end "typedefs.hpp" */
 /*? begin "alias.hpp" */
+#define EB emplace_back
 #define PB push_back
 #define foldl accumulate
 #define scanl partial_sum
@@ -140,7 +144,7 @@ TL<TN T>IL bool amin(T&v,CS T&a){RT v>a&&(v=a,true);}
  TL<TN T>IL CX CS T&clamp(CS T&a,CS T&mn,CS T&mx){RT a<mn?mn:a>mx?mx:a;}
 #endif
 
-TL<TN T>int size_RAB(T t){RT t.size();}
+TL<TN T>IL int size_RAB(T t){RT t.size();}
 #define size size_RAB
 
 TL<TN V>IL void uniq_after_sort(V&v){v.erase(unique(iter(v)),v.end());}
@@ -162,7 +166,13 @@ TL<TN V>IL auto flatten(CS V&xss,int reserve_size=0)->TN V::value_type{
 
 TL<TN I>IL bool is_in(I x,I l,I r){RT l<=x&&x<r;}
 
-TL<TN T>IL T fetch(const vec<T>&v,int i,T d){RT is_in(i,0,size(v))?v[i]:d;}
+TL<TN T>IL T fetch(CS T&d,CS vec<T>&v,int i){RT 0<=i&&i<size(v)?v[i]:d;}
+TL<TN T>IL T fetch(CS T&d,CS vvec<T>&v,int i,int j){
+  RT 0<=i&&i<size(v)&&0<=j&&j<size(v[i])?v[i][j]:d;
+}
+// TL<TN T,TN U,TN...I>IL T fetch(CS T&d,CS vec<vec<U>>&v,int i,I...j){
+// RT 0<=i&&i<size(v)?fetch(d,v[i],j...):d;
+// }
 TL<TN T>struct Compressed{int size;map<T,int>zip;vec<T>unzip;};
 TL<TN T>IL Compressed<T>compressed(vec<T>v){
   sort_and_uniq(v);map<T,int>zip;times(size(v),i)zip[v[i]]=i;RT{size(v),zip,move(v)};
@@ -172,6 +182,7 @@ TL<TN T>IL CompressedSrc<T>compressed_src(CS vec<T>&v){
   auto c=compressed(v);VI src(c.size);times(size(v),i)src[c.zip[v[i]]].PB(i);RT{c.size,c.zip,c.unzip,src};
 }
 
+struct identity{TL<TN U>U operator()(U&&v)CS{RT v;}};
 }
 /*? end "util.hpp" */
 /*? begin "debug.hpp" */
@@ -210,88 +221,58 @@ signed main(){
  return 0;
 }
 /*? end "base.hpp" */
-/*? begin "nck.hpp" */
-/*? begin "fact.hpp" */
+constexpr LD EPS = 1e-10;
+/*? begin "geo_totuxau.hpp" */
+/*? begin "geo.hpp" */
+//CX LD EPS=1e-10;
+TL<TN T>
+T eps_add(T a,T b){RT IF(abs(a+b)<EPS*(abs(a)+abs(b)),(T)0,a+b);}
+TL<TN T>
+bool eps_equal(T a,T b){RT abs(a-b)<EPS;}
+TL<TN T>
+struct GVec{T x,y;
+GVec():x(0),y(0){}
+GVec(T x,T y):x(x),y(y){}
+GVec OP+(CS GVec&v)CS{RT{eps_add(x,v.x),eps_add(y,v.y)};
+}
+GVec OP-(CS GVec&v)CS{RT{eps_add(x,-v.x),eps_add(y,-v.y)};
+}
+GVec OP*(T t)CS{RT{x*t,y*t};
+}
+bool OP<(CS GVec&v)CS{RT IF(eps_equal(x,v.x),y<v.y,x<v.x);
+}
+T dot(CS GVec&v)CS{RT eps_add(x*v.x,y*v.y);
+}
+T det(CS GVec&v)CS{RT eps_add(x*v.y,-y*v.x);
+}
+T size2()CS{RT dot(*this);
+}
+T dist2(CS GVec&v)CS{RT(*this-v).size2();}};
 
-/*! https://twitter.com/meguru_comp/status/694207919517077504 */
-VM fact, fact_inv;
-inline void fact_init(int n) {
-  int a = size(fact);
-  if(a > n) return;
-  fact.resize(n+1);
-  fact_inv.resize(n+1);
-  if(a == 0) {
-    fact[a] = fact_inv[a] = mint(1);
-    ++a;
-  }
-  upto(a, n, i) fact[i] = fact[i-1] * mint(i);
-  fact_inv[n] = fact[n].inv();
-  downto(n-1, a, i) fact_inv[i] = fact_inv[i+1] * mint(i+1);
+/*? end "geo.hpp" */
+TL<TN T>
+vec<GVec<T>>convex_hull(vec<GVec<T>>ps){sort(iter(ps));RT convex_hull_from_sorted(ps);
 }
-/*? end "fact.hpp" */
-
-/*! https://twitter.com/meguru_comp/status/694547019885449216 */
-inline mint nCk(int n, int k, bool check_init = true) {
-  if(check_init && size(fact) <= n) fact_init(n);
-  if(0 <= k && k <= n) return fact[n] * fact_inv[k] * fact_inv[n-k];
-  else return mint(0);
+TL<TN T>
+vec<GVec<T>>convex_hull_from_sorted(CS vec<GVec<T>>&ps){int n=size(ps),k=0;
+vec<GVec<T>>ch(n*2);times(n,i){CS auto&p=ps[i];
+while(k>1&&(ch[k-1]-ch[k-2]).det(p-ch[k-1])<=0)--k;ch[k++]=p;
 }
-inline mint nPk(int n, int k, bool check_init = true) {
-  if(check_init && size(fact) <= n) fact_init(n);
-  if(0 <= k && k <= n) return fact[n] * fact_inv[n-k];
-  else return mint(0);
+int t=k;downto(n-2,0,i){CS auto&p=ps[i];
+while(k>t&&(ch[k-1]-ch[k-2]).det(p-ch[k-1])<=0)--k;ch[k++]=p;
 }
-/*? end "nck.hpp" */
+ch.resize(k-1);RT ch;
+}
+/*? end "geo_totuxau.hpp" */
 //#include "consts.hpp"
 
-mint dp[6001][3001];
-
 void solve() {
-// N X
-/* <foxy.memo-area> */
-int N;int X;cin>>N;cin>>X;
-/* </foxy.memo-area> */
+  while(1) {
+    int N; cin >> N;
+    if(!N) return;
+    vec<GVec<LD>> XY(N); char comma;
+    times(N, i) cin >> XY[i].x >> comma >> XY[i].y;
 
-  dp[0][0] = mint(1);
-
-  VM anss(N + 1);
-
-  times(N, i) {
-    times(X, j) {
-      dp[j + 1][i + 1] += dp[j][i];
-
-      if(j + 2 <= X) dp[j + 2][i + 1] += dp[j][i];
-    }
+    cout << N - size(convex_hull(XY)) ln;
   }
-
-  // dd dp;
-
-  // mint ans1 = 0_m, ans2 = 0_m;
-  upto(0, N, i) {
-    times(X, j) {
-      anss[i] += dp[j][i];
-    }
-  }
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  anss: "<<(anss)ln<<"  '?':  "<<('?')ln;}
-  upto(1, min(N / 2, (X - 1) / 2), a) {
-    // dd a;
-    upto(0, N - 2 * a, k) {
-      // dd k; X - 1 - 2 * a; (N - 2 * a) - k; dp[X - 1 - 2 * a][(N - 2 * a) - k];
-      anss[N - k] += dp[X - 1 - 2 * a][(N - 2 * a) - k];
-    }
-  }
-
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  anss: "<<(anss)ln<<"  '*':  "<<('*')ln;}
-  if(X % 2 == 1 && N > (X - 1)) {
-    upto(1, N - (X - 1), t) {
-      anss[X - 1 + t] += 1_m; // 22...22
-    }
-  }
-
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  anss: "<<(anss)ln<<"  '!':  "<<('!')ln;}
-  mint ans = 0_m;
-  fact_init(N);
-  times(N + 1, k) ans += anss[k] * nCk(N, k);
-
-  cout << ans ln;
 }

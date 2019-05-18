@@ -1,0 +1,12 @@
+---
+virtual: false
+gcj: false
+problems:
+- status: ac
+  url:
+    - http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=0068
+    - http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3577969
+- status: ac
+  url:
+    - https://atcoder.jp/contests/abc022/tasks/abc022_d
+    - https://atcoder.jp/contests/abc022/submissions/5433447
