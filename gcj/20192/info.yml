@@ -1,8 +1,17 @@
 ---
-virtual: true
+virtual: false
 gcj: true
 problems:
-- status: 
-- status: 
-- status: 
-- status: 
+- status: ac
+  time: 45m
+- status:
+  review:
+    適当に投げてもそれなりに通りそうだったのでDより優先してやった方がよかった。(ほんまか)
+- status: ac
+  time: 26m
+  review:
+    コンテスト中に典型っぽさを感じてググって見つけられたのはよかった。
+    実装がつらかった。分数ライブラリを用意するべき。stern-brocotも入れたい。
+- status: wa
+  review:
+    強連結成分分解をverifyするべき。コーナーケースが多そうな問題なので後回しにした方がよかった。

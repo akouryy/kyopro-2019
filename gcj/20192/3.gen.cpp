@@ -57,7 +57,7 @@ using ULL=unsigned long long;
 #define riter(v) rbegin(v),rend(v)
 #define criter(v) crbegin(v),crend(v)
 #define IF(a,b,c) ((a)?(b):(c))
-#define BINOP_ASGN(t,u,op) t operator op(CS u&o)CS{RT t(*this)op##=o;}
+#define BINOP_ASGN(t,u,op) t OP op(CS u&o)CS{RT t(*this)op##=o;}
 #if debug
  #define _GLIBCXX_DEBUG
  #define _LIBCPP_DEBUG 2
@@ -83,7 +83,8 @@ TL<TN T>T power(T x,int n){T rt(1);for(;n;n/=2){if(n%2)rt*=x;x*=x;}RT rt;}
 int pow_mod(int x,int n,int m){int rt=1;for(;n;n/=2){if(n%2)rt=rt*x%m;x=x*x%m;}RT rt;}
 int128 pow_mod_64(int128 x,int n,int m){int128 rt=1;for(;n;n/=2){if(n%2)rt=rt*x%m;x=x*x%m;}RT rt;}
 /*?^power.hpp*/
-IL CX int modulo(int a,int m){RT(a%=m,a>=0?a:a+m);}
+IL CX int modulo(int a,int b){a%=b;RT a==0||(a>0)==(b>0)?a:a+b;}
+IL CX int divide(int a,int b){RT (a-modulo(a,b))/b;}
 TL<ULL mod=MOD>class MInt{
   /*! https://ei1333.github.io/luzhiled/snippets/other/mod-int.html */
 public:
@@ -124,7 +125,7 @@ TL<TN T>using vvvec=vec<vvec<T>>;
 TL<TN T>using vvvvec=vec<vvvec<T>>;
 
 //#pragma rab typedefs.dynamic
-using WI = vvec<int>; using VI = vec<int>; using PII = pair<int, int>; 
+using WI = vvec<int>; using VI = vec<int>; 
 /*?^typedefs.hpp*/
 /*?alias.hpp*/
 #define EB emplace_back
@@ -242,6 +243,7 @@ namespace dict {
   IMPOSSIBLE[]="IMPOSSIBLE", Impossible[]="Impossible", impossible[]="impossible",
   PRIME[]="PRIME", Prime[]="Prime", prime[]="prime",
   NOT_PRIME[]="NOT PRIME", Not_Prime[]="Not Prime", not_prime[]="not prime",
+  UNBOUNDED[]="UNBOUNDED", Unbounded[]="Unbounded", unbounded[]="unbounded",
   ALICE[]="ALICE", Alice[]="Alice", alice[]="alice",
   BOB[]="BOB", Bob[]="Bob", bob[]="bob",
   BROWN[]="BROWN", Brown[]="Brown", brown[]="brown",
@@ -251,24 +253,49 @@ namespace dict {
   AOKI[]="AOKI", Aoki[]="Aoki", aoki[]="aoki";
 }
 /*?^consts.hpp*/
-
-PII sternBrocot(int p, int q, int r, int s) {
-  int xl = 0, yl = 1, xr = 1, yr = 0;
-
-  while(true) {
-    int xm = xl + xr, ym = yl + yr;
-
-    if(r * ym < xm * s) {
-      if(xm * q < p * ym) {
-        return {xm, ym};
-      } else {
-        xr = xm; yr = ym;
-      }
-    } else {
-      xl = xm; yl = ym;
-    }
-  }
+/*?math_rational_bsearch.hpp*/
+/*?math_rational.hpp*/
+/*?math.hpp*/
+IL int int_abs(int k){RT k>=0?k:-k;}
+IL int int_sign(int k){RT k>0?1:k==0?0:-1;}
+int gcd(int a,int b){int t;while(b)t=b,b=a%b,a=t;RT int_abs(a);}
+/*?^math.hpp*/
+#define CMPOP(t,op,f1,f2,x)bool OP op(CS t&x)CS{RT f1 op f2;}
+#define CMPOPS(t,f1,f2,x)CMPOP(t,==,f1,f2,x)CMPOP(t,!=,f1,f2,x)\
+CMPOP(t,<,f1,f2,x)CMPOP(t,<=,f1,f2,x)CMPOP(t,>,f1,f2,x)CMPOP(t,>=,f1,f2,x)
+struct Rational{int si,bo;Rational(int s=0,int b=1,bool do_gcd=true){if(b==0){bo=b;
+si=int_sign(s);}else{int g=IF(do_gcd&&b!=1,gcd(s,b),1);si=s/g*int_sign(b);bo=IF(si,int_abs(b)/g,1);
+}}
+Rational OP+(CS Rational&r)CS{RT{si*r.bo+r.si*bo,bo*r.bo};
 }
+Rational OP-(CS Rational&r)CS{RT{si*r.bo-r.si*bo,bo*r.bo};
+}
+Rational OP*(CS Rational&r)CS{RT{si*r.si,bo*r.bo};
+}
+Rational OP/(CS Rational&r)CS{RT{si*r.bo,bo*r.si};
+}
+CMPOPS(Rational,(int128)si*r.bo,(int128)r.si*bo,r)
+explicit OP int()CS{RT floor();
+}
+int floor()CS{RT divide(si,bo);
+}
+int ceil()CS{RT divide(si+bo-1,bo);
+}
+explicit OP LD()CS{RT(LD)si/bo;
+}
+friend ostream&OP<<(ostream&o,CS Rational&r){RT o<<"("<<r.si<<"/"<<r.bo<<")";
+}};
+/*?^math_rational.hpp*/
+Rational rational_bsearch_between_exclusive(CS Rational&a,CS Rational&b){
+assert(Rational(0)<=a&&a<b);Rational l(0,1),r(1,0);while(true){Rational m(l.si+r.si,l.bo+r.bo,false);
+bool changed=false;if(m<=a){downto(62,0,i){if((r.si|r.bo)>>(63-i))continue;
+Rational x={l.si+(r.si<<i),l.bo+(r.bo<<i),false,};if(x<=a){l=x;
+changed=true;
+}}}else if(b<=m){downto(62,0,i){if((l.si|l.bo)>>(63-i))continue;
+Rational x={(l.si<<i)+r.si,(l.bo<<i)+r.bo,false,};if(b<=x){r=x;
+changed=true;}}}else RT m;assert(changed);
+}}
+/*?^math_rational_bsearch.hpp*/
 
 void solve(int gcj_case_id) {
 // NN(CJ)
@@ -276,15 +303,16 @@ void solve(int gcj_case_id) {
 int N;cin>>N;VI C(N);VI J(N);times(N,Ri_0){cin>>C[Ri_0];cin>>J[Ri_0];}
 /* </foxy.memo-area> */
 
-  int p = 1, q = 0, r = 0, s = 1;
+  Rational p(1, 0), r(0, 1);
 
   times(N, a) uptil(a + 1, N, b) {
     // c * C[a] + j * J[a] < c * C[b] + j * J[b]
     if(C[b] > C[a]) {
       if(J[b] >= J[a]) continue; // always true
-      int pp = C[b] - C[a], qq = J[a] - J[b];
+      Rational pp(C[b] - C[a], J[a] - J[b]);
       // c * pp > j * qq
-      if(p * qq > pp * q) { p = pp; q = qq; }
+      {if(debug)cerr<<'#'<<__LINE__ ln<<"  a:       "<<(a)ln<<"  b:       "<<(b)ln<<"  p:       "<<(p)ln<<"  pp:      "<<(pp)ln<<"  p < pp:  "<<(p < pp)ln<<"  p == pp: "<<(p == pp)ln;}
+      amin(p, pp);
     } else if(C[b] == C[a]) {
       if(J[b] > J[a]) continue; // always true
       // always false
@@ -295,18 +323,19 @@ int N;cin>>N;VI C(N);VI J(N);times(N,Ri_0){cin>>C[Ri_0];cin>>J[Ri_0];}
         cout << dict::IMPOSSIBLE ln;
         return;
       }
-      int rr = C[a] - C[b], ss = J[b] - J[a];
+      Rational rr(C[a] - C[b], J[b] - J[a]);
+      {if(debug)cerr<<'#'<<__LINE__ ln<<"  a:       "<<(a)ln<<"  b:       "<<(b)ln<<"  r:       "<<(r)ln<<"  rr:      "<<(rr)ln<<"  r < rr:  "<<(r < rr)ln<<"  r == rr: "<<(r == rr)ln;}
       // c * rr < j * ss
-      if(r * ss < rr * s) { r = rr; s = ss; }
+      amax(r, rr);
     }
   }
-  {if(debug)cerr<<'#'<<__LINE__ ln<<"  p: "<<(p)ln<<"  q: "<<(q)ln<<"  r: "<<(r)ln<<"  s: "<<(s)ln;}
-  if(p * s <= r * q) {
+  {if(debug)cerr<<'#'<<__LINE__ ln<<"  p: "<<(p)ln<<"  r: "<<(r)ln;}
+  if(p <= r) {
     cout << dict::IMPOSSIBLE ln;
     return;
   }
 
-  PII a = sternBrocot(p, q, r, s);
+  Rational a = rational_bsearch_between_exclusive(r, p);
 
-  cout << a.second sp << a.first ln;
+  cout << a.bo sp << a.si ln;
 }

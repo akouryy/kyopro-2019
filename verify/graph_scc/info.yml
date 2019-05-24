@@ -1,0 +1,9 @@
+---
+virtual: false
+gcj: false
+url:
+problems:
+- status: ac
+  url:
+    - http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_3_C
+    - http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3595976

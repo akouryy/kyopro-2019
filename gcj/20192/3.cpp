@@ -1,24 +1,7 @@
 #define GCJ_CASE
 #include "base.hpp"
 #include "consts.hpp"
-
-PII sternBrocot(int p, int q, int r, int s) {
-  int xl = 0, yl = 1, xr = 1, yr = 0;
-
-  while(true) {
-    int xm = xl + xr, ym = yl + yr;
-
-    if(r * ym < xm * s) {
-      if(xm * q < p * ym) {
-        return {xm, ym};
-      } else {
-        xr = xm; yr = ym;
-      }
-    } else {
-      xl = xm; yl = ym;
-    }
-  }
-}
+#include "math_rational_bsearch.hpp"
 
 void solve(int gcj_case_id) {
 // NN(CJ)
@@ -26,15 +9,16 @@ void solve(int gcj_case_id) {
 int N;cin>>N;VI C(N);VI J(N);times(N,Ri_0){cin>>C[Ri_0];cin>>J[Ri_0];}
 /* </foxy.memo-area> */
 
-  int p = 1, q = 0, r = 0, s = 1;
+  Rational p(1, 0), r(0, 1);
 
   times(N, a) uptil(a + 1, N, b) {
     // c * C[a] + j * J[a] < c * C[b] + j * J[b]
     if(C[b] > C[a]) {
       if(J[b] >= J[a]) continue; // always true
-      int pp = C[b] - C[a], qq = J[a] - J[b];
+      Rational pp(C[b] - C[a], J[a] - J[b]);
       // c * pp > j * qq
-      if(p * qq > pp * q) { p = pp; q = qq; }
+      dd a; b; p; pp; p < pp; p == pp;
+      amin(p, pp);
     } else if(C[b] == C[a]) {
       if(J[b] > J[a]) continue; // always true
       // always false
@@ -45,18 +29,19 @@ int N;cin>>N;VI C(N);VI J(N);times(N,Ri_0){cin>>C[Ri_0];cin>>J[Ri_0];}
         cout << dict::IMPOSSIBLE ln;
         return;
       }
-      int rr = C[a] - C[b], ss = J[b] - J[a];
+      Rational rr(C[a] - C[b], J[b] - J[a]);
+      dd a; b; r; rr; r < rr; r == rr;
       // c * rr < j * ss
-      if(r * ss < rr * s) { r = rr; s = ss; }
+      amax(r, rr);
     }
   }
-  dd p; q; r; s;
-  if(p * s <= r * q) {
+  dd p; r;
+  if(p <= r) {
     cout << dict::IMPOSSIBLE ln;
     return;
   }
 
-  PII a = sternBrocot(p, q, r, s);
+  Rational a = rational_bsearch_between_exclusive(r, p);
 
-  cout << a.second sp << a.first ln;
+  cout << a.bo sp << a.si ln;
 }
