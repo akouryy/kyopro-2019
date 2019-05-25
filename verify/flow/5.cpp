@@ -9,7 +9,7 @@ void solve() {
 int H;int W;cin>>H;cin>>W;VS S(H);times(H,Ri_0){cin>>S[Ri_0];}
 /* </foxy.memo-area> */
 
-  Graph<unit, int> g(H * W * 2 + 2);
+  Graph<int> g(H * W * 2 + 2);
 
   int s = H * W * 2, t = H * W * 2 + 1;
 
@@ -48,6 +48,6 @@ int H;int W;cin>>H;cin>>W;VS S(H);times(H,Ri_0){cin>>S[Ri_0];}
     }
   }
 
-  dinic<int, unit, int> d(g);
+  dinic<int, int> d(g);
   cout << d.exec(s, t) ln;
 }

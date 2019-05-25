@@ -6,7 +6,7 @@ problems:
 - status: ac
   url:
     - http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_6_A&lang=jp
-    - http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3577769
+    - http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3598003
 - status: ac
   url:
     - https://yukicoder.me/problems/no/654
@@ -22,7 +22,7 @@ problems:
 - status: ac
   url:
     - https://atcoder.jp/contests/kupc2016/tasks/kupc2016_e
-    - https://atcoder.jp/contests/kupc2016/submissions/5432589
+    - https://atcoder.jp/contests/kupc2016/submissions/5620557
 - status: ac
   url:
     - http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_7_A
