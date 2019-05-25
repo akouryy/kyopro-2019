@@ -1,5 +1,5 @@
 #define GCJ_CASE
-/*?base.hpp*/
+#line 1 "base.hpp"//4
 #ifndef __clang__
 #pragma GCC optimize ("O3")
 #endif
@@ -25,9 +25,6 @@ void solve( /*  */
 #include<set>
 #include<type_traits>
 #include<vector>
-#ifdef __cpp_lib_execution
-  #include<execution>
-#endif
 #include<cassert>
 #include<climits>
 #include<cmath>
@@ -46,75 +43,71 @@ using ULL=unsigned long long;
 #define TL template
 #define TN typename
 #define lambda [&]
-#define times(n,i) uptil(0,n,i)
-#define rtimes(n,i) downto((n)-1,0,i)
-#define upto(f,t,i) for(int rabT##i=(t),i=(f);i<=rabT##i;i++)
-#define uptil(f,t,i) for(int rabT##i=(t),i=(f);i< rabT##i;i++)
-#define downto(f,t,i) for(int rabT##i=(t),i=(f);i>=rabT##i;i--)
-#define downtil(f,t,i) for(int rabT##i=(t),i=(f);i> rabT##i;i--)
-#define iter(v) begin(v),end(v)
-#define citer(v) cbegin(v),cend(v)
-#define riter(v) rbegin(v),rend(v)
-#define criter(v) crbegin(v),crend(v)
-#define IF(a,b,c) ((a)?(b):(c))
-#define BINOP_ASGN(t,u,op) t operator op(CS u&o)CS{RT t(*this)op##=o;}
+#define rep(f,t,i,c,u)for(int Rb_=(t),i=(f);i c Rb_;u(i))
+#define upto(f,t,i)rep(f,t,i,<=,++)
+#define uptil(f,t,i)rep(f,t,i,<,++)
+#define downto(f,t,i)rep(f,t,i,>=,--)
+#define downtil(f,t,i)rep(f,t,i,>,--)
+#define times(n,i)uptil(0,n,i)
+#define rtimes(n,i)downto((n)-1,0,i)
+#define iter(v)begin(v),end(v)
+#define citer(v)cbegin(v),cend(v)
+#define riter(v)rbegin(v),rend(v)
+#define criter(v)crbegin(v),crend(v)
+#define IF(a,b,c)((a)?(b):(c))
 #if debug
- #define _GLIBCXX_DEBUG
- #define _LIBCPP_DEBUG 2
- #define _LIBCPP_DEBUG2 2
- #define ln <<endl
+#define _GLIBCXX_DEBUG
+#define _LIBCPP_DEBUG 2
+#define _LIBCPP_DEBUG2 2
+#define ln <<endl
 #else
- #define ln <<'\n'
+#define ln <<'\n'
 #endif
 #define tb <<'\t'
 #define sp <<' '
- #define PARABLE 
-/*?mod.hpp*/
+#line 1 "base_util.hpp"//4b
+#define BINOP_ASGN(t,u,op)t OP op(CS u&o)CS{RT t(*this)op##=o;}
+#define CMPOP(t,op,f1,f2,x)bool OP op(CS t&x)CS{RT f1 op f2;}
+#define CMPOPS(t,f1,f2,x)CMPOP(t,==,f1,f2,x)CMPOP(t,!=,f1,f2,x)\
+CMPOP(t,<,f1,f2,x)CMPOP(t,<=,f1,f2,x)CMPOP(t,>,f1,f2,x)CMPOP(t,>=,f1,f2,x)
+#line 1 "mod.hpp"//4b
 #ifdef MOD
- #if !defined(FORCE_MOD)&&MOD!=1000000007&&MOD!=1000000009&&MOD!=998244353
-  #error unknown mod MOD and FORCE_MOD not defined.
- #endif
-#else
- #define MOD 1000000007
+#if !defined(FORCE_MOD)&&MOD!=1000000007&&MOD!=1000000009&&MOD!=998244353
+#error unknown mod MOD and FORCE_MOD not defined.
 #endif
-/*?power.hpp*/
+#else
+#define MOD 1000000007
+#endif
+#line 1 "power.hpp"//4bm
 using int128=__int128;
 TL<TN T>T power(T x,int n){T rt(1);for(;n;n/=2){if(n%2)rt*=x;x*=x;}RT rt;}
 int pow_mod(int x,int n,int m){int rt=1;for(;n;n/=2){if(n%2)rt=rt*x%m;x=x*x%m;}RT rt;}
 int128 pow_mod_64(int128 x,int n,int m){int128 rt=1;for(;n;n/=2){if(n%2)rt=rt*x%m;x=x*x%m;}RT rt;}
-/*?^power.hpp*/
-IL CX int modulo(int a,int m){RT(a%=m,a>=0?a:a+m);}
+#line 3001 "mod.hpp"//4b
+IL CX int modulo(int a,int b){a%=b;RT a==0||(a>0)==(b>0)?a:a+b;}
+IL CX int divide(int a,int b){RT(a-modulo(a,b))/b;}
 TL<ULL mod=MOD>class MInt{
-  /*! https://ei1333.github.io/luzhiled/snippets/other/mod-int.html */
-public:
-  int val;
-  CX MInt():val(0){}
-  explicit CX MInt(int v):val(modulo(v,mod)){}
-  MInt&operator+=(CS MInt&m){val+=m.val;if(val>=mod)val-=mod;RT*this;}
-  MInt&operator-=(CS MInt&m){val-=m.val;if(val<0)val+=mod;RT*this;}
-  MInt&operator*=(CS MInt&m){val=val*m.val%mod;RT*this;}
-  MInt&operator/=(CS MInt&m){val=val*m.inv().val%mod;RT*this;}
-  BINOP_ASGN(MInt,MInt,+) BINOP_ASGN(MInt,MInt,-) BINOP_ASGN(MInt,MInt,*) BINOP_ASGN(MInt,MInt,/)
-  MInt operator-()CS{MInt m;m.val=val?mod-val:0;RT m;}
-  bool operator==(CS MInt&m)CS{RT val==m.val;}
-  bool operator!=(CS MInt&m)CS{RT val!=m.val;}
-  //MInt pow(int n)CS{MInt x(*this),rt(1);while(n){if(n%2)rt*=x;x*=x;n/=2;}RT rt;}
-  MInt pow(int n)CS{RT power(*this,n);}
-  MInt inv()CS{int a=val,b=mod,x=1,y=0,t;while(b){t=a/b;swap(b,a-=t*b);swap(y,x-=t*y);}RT(MInt)x;}
-  friend ostream&operator<<(ostream&o,CS MInt<mod>&m){RT o<<m.val;}
-  friend istream&operator>>(istream&i,MInt<mod>&m){int v;i>>v;m=MInt<mod>(v);RT i;}
-};
-using mint=MInt<>;
-
-constexpr mint operator"" _m(ULL n){RT mint(n);}
-constexpr MInt<998244353>operator"" _m998244353(ULL n){RT MInt<998244353>(n);}
-constexpr MInt<1000000007>operator"" _m1e9_7(ULL n){RT MInt<1000000007>(n);}
-constexpr MInt<1000000009>operator"" _m1e9_9(ULL n){RT MInt<1000000009>(n);}
-
-//#pragma rab:gsub \b(\d+)m\b mint(\1)
-/*?^mod.hpp*/
-/*?typedefs.hpp*/
-struct unit{};
+/*!https://ei1333.github.io/luzhiled/snippets/other/mod-int.html*/
+public:int val;
+CX MInt():val(0){}explicit CX MInt(int v):val(modulo(v,mod)){}
+MInt&OP+=(CS MInt&m){val+=m.val;if(val>=mod)val-=mod;RT*this;}
+MInt&OP-=(CS MInt&m){val-=m.val;if(val<0)val+=mod;RT*this;}MInt&OP*=(CS MInt&m){val=val*m.val%mod;RT*this;}
+MInt&OP/=(CS MInt&m){val=val*m.inv().val%mod;RT*this;}
+BINOP_ASGN(MInt,MInt,+)BINOP_ASGN(MInt,MInt,-)BINOP_ASGN(MInt,MInt,*)BINOP_ASGN(MInt,MInt,/)
+MInt OP-()CS{MInt m;m.val=val?mod-val:0;RT m;}bool OP==(CS MInt&m)CS{RT val==m.val;}
+bool OP!=(CS MInt&m)CS{RT val!=m.val;}
+//MInt pow(int n)CS{MInt x(*this),rt(1);while(n){if(n%2)rt*=x;x*=x;n/=2;}RT rt;}
+MInt pow(int n)CS{RT power(*this,n);}
+MInt inv()CS{int a=val,b=mod,x=1,y=0,t;while(b){t=a/b;swap(b,a-=t*b);swap(y,x-=t*y);}RT(MInt)x;}
+friend ostream&OP<<(ostream&o,CS MInt<mod>&m){RT o<<m.val;}
+friend istream&OP>>(istream&i,MInt<mod>&m){int v;i>>v;m=MInt<mod>(v);RT i;}
+};using mint=MInt<>;CX mint OP"" _m(ULL n){RT mint(n);}
+CX MInt<998244353>OP"" _m998244353(ULL n){RT MInt<998244353>(n);}
+CX MInt<1000000007>OP"" _m1e9_7(ULL n){RT MInt<1000000007>(n);}
+CX MInt<1000000009>OP"" _m1e9_9(ULL n){RT MInt<1000000009>(n);}
+#line 1 "typedefs.hpp"//4b
+// struct unit{};
+using unit = tuple<>;
 
 using int128=__int128;
 using LD=long double;
@@ -123,16 +116,13 @@ TL<TN T>using vvec=vec<vec<T>>;
 TL<TN T>using vvvec=vec<vvec<T>>;
 TL<TN T>using vvvvec=vec<vvvec<T>>;
 
-//#pragma rab typedefs.dynamic
-using WI = vvec<int>; using VI = vec<int>; using VB = vec<bool>; using VM = vec<mint>; 
-/*?^typedefs.hpp*/
-/*?alias.hpp*/
+using WI=vvec<int>;using VI=vec<int>;using VB=vec<bool>;using VM=vec<mint>;
+#line 1 "alias.hpp"//4b
 #define EB emplace_back
 #define PB push_back
 #define foldl accumulate
 #define scanl partial_sum
-/*?^alias.hpp*/
-/*?util.hpp*/
+#line 1 "util.hpp"//4b
 TL<TN T>IL bool amax(T&v,CS T&a){RT v<a&&(v=a,true);}
 TL<TN T>IL bool amin(T&v,CS T&a){RT v>a&&(v=a,true);}
 
@@ -155,7 +145,7 @@ TL<TN V,TN K>IL auto leftmost_gt(CS V&v,CS K&k){RT v.upper_bound(k);}
 
 namespace rab{
 
-TL<TN V,TN W>IL void append(V&v,CS W&w){copy(PARABLE citer(w),back_inserter(v));}
+TL<TN V,TN W>IL void append(V&v,CS W&w){copy(citer(w),back_inserter(v));}
 
 TL<TN V>IL auto flatten(CS V&xss,int reserve_size=0)->TN V::value_type{
   decltype(flatten(xss))ret;
@@ -183,163 +173,117 @@ TL<TN T>IL CompressedSrc<T>compressed_src(CS vec<T>&v){
   auto c=compressed(v);VI src(c.size);times(size(v),i)src[c.zip[v[i]]].PB(i);RT{c.size,c.zip,c.unzip,src};
 }
 
-struct identity{TL<TN U>U operator()(U&&v)CS{RT v;}};
+struct identity{TL<TN U>U OP()(U&&v)CS{RT v;}};
 }
-/*?^util.hpp*/
-/*?debug.hpp*/
-TL<class T>
-IL istream&operator>>(istream&s,vec<T>&v){for(auto&&p:v)s>>p;RT s;}
-TL<class T,class S>
-IL ostream&operator<<(ostream&s,CS pair<T,S>&p){RT s<<"("<<p.first<<","<<p.second<<")";}
-TL<class T>
-IL ostream&operator<<(ostream&,CS vec<T>&);
-TL<class T,class S>
-IL ostream&operator<<(ostream&,CS map<T,S>&);
-#define DEFINE_ITER_OUTPUT(s,x,sep){int i=0;for(CS auto&x##0_elem:x){if(i++)s<<sep;s<<x##0_elem;}RT s;}
-TL<class T>
-IL ostream&operator<<(ostream&s,CS vec<T>&v)DEFINE_ITER_OUTPUT(s,v,' ')
-TL<class T,class S>
-IL ostream&operator<<(ostream&s,CS map<T,S>&m)DEFINE_ITER_OUTPUT(s,m,' ')
-TL<class T>
-IL ostream&operator<<(ostream&s,CS vec<vec<T>>&w)DEFINE_ITER_OUTPUT(s,w,'\n')
-TL<class T,class S>
-IL ostream&operator<<(ostream&s,CS vec<map<T,S>>&v)DEFINE_ITER_OUTPUT(s,v,'\n')
-/*?^debug.hpp*/
+#line 1 "debug.hpp"//4b
+TL<TN T>IL istream&OP>>(istream&s,vec<T>&v){for(auto&&p:v)s>>p;RT s;}
+TL<TN T,TN S>IL ostream&OP<<(ostream&s,CS pair<T,S>&p){RT s<<"("<<p.first<<","<<p.second<<")";}
+#define Rdebug1(sep, ...)IL ostream& OP<<(ostream&s,CS __VA_ARGS__&v){\
+int i=0;for(CS auto&e:v){i++&&s<<sep;s<<e;}RT s;}
+TL<TN T>Rdebug1(' ',vec<T>)TL<TN T,TN S>Rdebug1(' ',map<T,S>)
+TL<TN T>Rdebug1('\n',vvec<T>)TL<TN T,TN S>Rdebug1('\n',vec<map<T,S>>)
+#line 6001 "base.hpp"//4
 
 signed main(){
- {if(debug)cerr<<"MOD: "<<(MOD)ln;}
- if(!debug)cin.tie(0),cerr.tie(0),ios::sync_with_stdio(0);
- cout<<fixed<<setprecision(20);
- cerr<<fixed<<setprecision(20);
-
- #ifdef GCJ_CASE
-  int T;cin>>T;
-  times(T,t){cout<<"Case #"<<t+1<<": ";solve(t);}
- #else
-  solve();
- #endif
-
- return 0;
-}
-/*?^base.hpp*/
-/*?graph.hpp*/
-/*?uf.hpp*/
-TL<class T=int,class Adder=plus<T>,class Inverser=negate<T>>
-class UnionFind{
+if(debug)cerr<<"MOD: "<<MOD ln;else cin.tie(0),cerr.tie(0),ios::sync_with_stdio(0);
+auto p=setprecision(20);cout<<fixed<<p;cerr<<fixed<<p;
+#ifdef GCJ_CASE
+int T;cin>>T;times(T,t){cout<<"Case #"<<t+1<<": ";solve(t);}
+#else
+solve();
+#endif
+RT 0;}
+#line 1 "graph.hpp"//4
+#line 1 "uf.hpp"//4g
+TL<class T=int,class Adder=plus<T>,class Inverser=negate<T>>class UnionFind{
 /*!
 http://noshi91.hatenablog.com/entry/2018/05/30/191943
 https://en.wikipedia.org/wiki/Disjoint-set_data_structure
 https://qiita.com/drken/items/cce6fc5c579051e64fab
 */
-public:
-int n,*parents,*sizes;T*pot_diffs;bool to_delete;Adder adder;
-Inverser inverser;
-explicit UnionFind(int n,bool to_delete=false):
+public:int n,*parents,*sizes;T*pot_diffs;bool to_delete;
+Adder adder;Inverser inverser;explicit UnionFind(int n,bool to_delete=false):
 n(n),parents(new int[n]),sizes(new int[n]),pot_diffs(new T[n]),to_delete(to_delete)
-{clear();
-}
-void clear(){
-times(n,i)parents[i]=i;/*roots*/
-fill(sizes,sizes+n,1);fill(pot_diffs,pot_diffs+n,0);
-}
+{clear();}void clear(){
+times(n,i)parents[i]=i;fill(sizes,sizes+n,1);fill(pot_diffs,pot_diffs+n,0);}
 ~UnionFind(){if(to_delete){delete[]parents;delete[]sizes;delete[]pot_diffs;}}
-int size(){RT n;}
-int root(int i){int p=parents[i];
-if(p==i)RT i;/*`i`is a root*/
-int r=root(p);/*and pot_diffs[p]:=diff from root*/
-pot_diffs[i]+=pot_diffs[p];parents[i]=r;RT r;
-}
-bool is_same(int i,int j){RT root(i)==root(j);}
+int size(){RT n;}int root(int i){int p=parents[i];if(p==i)RT i;
+int r=root(p);pot_diffs[i]+=pot_diffs[p];RT parents[i]=r;}bool is_same(int i,int j){RT root(i)==root(j);}
 bool is_all_same(){int r=root(0);uptil(1,n,i)if(root(i)!=r)RT 0;RT 1;}
-bool merge(int i,int j,T pdiff=0){i=root(i);j=root(j);
-if(i==j)RT false;/*already merged*/
-if(sizes[i]>sizes[j]){swap(i,j);pdiff=inverser(pdiff);
-}
-/*now sizes[i]<=sizes[j]*/
-parents[i]=j;sizes[j]+=sizes[i];pot_diffs[i]=pdiff;RT true;
-}
-T diff(int i,int j){
-root(i);/*pot_diffs[i]:=diff from root*/
-root(j);/*pot_diffs[j]:=diff from root*/
+bool merge(int i,int j,T pdiff=0){i=root(i);j=root(j);if(i==j)RT 0;
+if(sizes[i]>sizes[j]){swap(i,j);pdiff=inverser(pdiff);}parents[i]=j;sizes[j]+=sizes[i];pot_diffs[i]=pdiff;RT 1;
+}T diff(int i,int j){root(i);root(j);
 RT adder(pot_diffs[i],inverser(pot_diffs[j]));}};using unionfind=UnionFind<>;
-/*?^uf.hpp*/
-TL<class EdgeVal>
-struct Edge{int from;int to;EdgeVal weight;
-Edge(int from,int to,EdgeVal weight):from(from),to(to),weight(weight){}
-IL bool OP==(CS Edge&e)CS{RT weight==e.weight&&from==e.from&&to==e.to;}
-IL bool OP<(CS Edge&e)CS{RT weight<e.weight||(weight==e.weight&&(from<e.from||(from==e.from&&to<e.to)));}
-IL bool OP<=(CS Edge&e)CS{RT this==e||this<e;}
-IL bool OP>(CS Edge&e)CS{RT e<this;}
-IL bool OP>=(CS Edge&e)CS{RT e<=this;}};
-TL<class VtxVal,class EdgeVal>
-class Graph{
-protected:
-int nv_,nde_;unionfind uf;
-public:
-vec<VtxVal>vs;vvec<Edge<EdgeVal>>edges;
-Graph(int nv):nv_(nv),nde_(0),uf(nv),vs(nv),edges(nv){}
-IL int nv()CS{RT nv_;}
-IL int nde()CS{RT nde_;}
+#line 2001 "graph.hpp"//4
+TL<TN E>struct Edge{int from;int to;E weight;
+Edge(int from,int to,E weight):from(from),to(to),weight(weight){}
+CMPOPS(Edge,make_tuple(weight,from,to),make_tuple(e.weight,e.from,e.to),e)
+};TL<TN E>class Graph{protected:int nv_,nde_;unionfind uf;public:
+vvec<Edge<E>>edges;Graph(int nv):nv_(nv),nde_(0),uf(nv),edges(nv){}
+IL int nv()CS{RT nv_;}IL int nde()CS{RT nde_;}
 IL int nue()CS{RT nde_/2;}
-IL void add_dedge(int i,int j,CS EdgeVal&val){
-if(debug&&(!rab::is_in(i,0LL,nv_)||!rab::is_in(j,0LL,nv_))){
+IL void add_dedge(int i,int j,CS E&val){if(debug&&(i<0||nv_<=i||j<0||nv_<=j)){
 cerr<<"invalid index:("<<i<<","<<j<<")for Graph(nv="<<nv_<<")" ln;
-exit(1);
-}
-edges[i].emplace_back(i,j,val);++nde_;
-}
-IL void add_uedge(int i,int j,CS EdgeVal&val){add_dedge(i,j,val);
-add_dedge(j,i,val);
-}
-IL bool is_connected(){uf.clear();
-for(CS auto&es:edges)for(CS auto&e:es)uf.merge(e.from,e.to);RT uf.is_all_same();
-}};
-/*?^graph.hpp*/
+exit(1);}edges[i].emplace_back(i,j,val);++nde_;
+}IL void add_uedge(int i,int j,CS E&val){add_dedge(i,j,val);add_dedge(j,i,val);
+}IL bool is_connected(){
+uf.clear();for(CS auto&es:edges)for(CS auto&e:es)uf.merge(e.from,e.to);
+RT uf.is_all_same();}};
+#line 1 "graph_scc.hpp"//4
+/*!https://ei1333.github.io/luzhiled/snippets/graph/strongly-connected-components.html*/
+TL<TN E>struct SCCer{int n;Graph<E>scc;CS Graph<E>&g;Graph<unit>grev;VB visited;VI po,zip;
+WI unzip;
+SCCer(CS Graph<E>&g):n(g.nv()),scc(0),g(g),grev(n),visited(n),zip(n,-1){
+po.reserve(n);times(n,i)for(CS auto&e:g.edges[i]){grev.add_dedge(e.to,e.from,{});}
+}private:void po_dfs(int i){if(visited[i])RT;
+visited[i]=1;for(CS auto&e:g.edges[i])po_dfs(e.to);po.PB(i);}
+void zip_rdfs(int i,int z){if(~zip[i])RT;zip[i]=z;for(CS auto&e:grev.edges[i])zip_rdfs(e.to,z);
+}public:void exec(){times(n,i)po_dfs(i);
+int z=0;for(auto it=po.rbegin();it!=po.rend();++it)if(zip[*it]==-1)zip_rdfs(*it,z++);scc=decltype(scc)(z);
+unzip.resize(z);for(auto it=po.rbegin();it!=po.rend();++it){int x=zip[*it];unzip[x].PB(*it);
+for(CS auto&e:g.edges[*it]){int y=zip[e.to];if(x!=y)assert(x<y),scc.add_dedge(x,y,e.weight);}
+}}};
+#line 3001 "4.cpp"//
 //#include "consts.hpp"
 
-void zp(Graph<unit, unit>& g, const VI &R, const VI &S, const VI &G, VB &par, VB &st, int i,
-VB& visited) {
+void dfs(const Graph<unit> &scc, const VM &zw, VM &tw,
+  const VB &znz, VB &tnz,
+  VB &visited, int i
+) {
   if(visited[i]) return;
-  if(par[i]) {
-    st[i] = true;
-    return;
-  }
-  par[i] = true;
-  for(const auto &e : g.edges[i]) {
-    zp(g, R, S, G, par, st, e.to, visited);
-  }
-  par[i] = false;
   visited[i] = true;
+  for(auto &e : scc.edges[i]) {
+    dfs(scc, zw, tw, znz, tnz, visited, e.to);
+    tw[i] += tw[e.to] + zw[e.to];
+    tnz[i] = tnz[i] || tnz[e.to] || znz[e.to];
+  }
 }
 
-/* 0: none, 1: positive, 2: positive loop */
-int zr(Graph<unit, unit>& g, const VI &R, const VI &S, const VI &G, VB &par,
-       const VB &st, VI &memo, int i) {
-  if(par[i]) return 0;
-  if(memo[i] >= 0) return memo[i];
-  par[i] = true;
-  int tm = G[i] != 0;
-  for(const auto &e : g.edges[i]) {
-    amax(tm, zr(g, R, S, G, par, st, memo, e.to));
+bool isUnbound(
+  const SCCer<unit> &sccer,
+  const Graph<unit> &scc, const Graph<unit> &g,
+  const VM &zw, const VM &tw,
+  const VB &znz, const VB &tnz,
+  VB &visited, VB &unbounded, int i,
+  bool init
+) {
+  if(visited[i]) return unbounded[i];
+  if(size(sccer.unzip[i]) >= 2 && (znz[i] || tnz[i])) {
+    if(!init) return unbounded[i] = true;
+    for(int gi : sccer.unzip[i]) {
+      int c = 0;
+      for(auto &ge : g.edges[gi]) {
+        c += sccer.zip[ge.to] == i;
+      }
+      if(c >= 2) return unbounded[i] = true;
+    }
   }
-  par[i] = false;
-  if(tm == 2) return memo[i] = 2;
-  if(tm == 1) return memo[i] = st[i] ? 2 : 1;
-  return memo[i] = 0;
-}
 
-mint zq(Graph<unit, unit>& g, const VI &R, const VI &S, const VI &G, VB &par,
-    VM &memo, VB &visited, int i) {
-  if(par[i]) return 0_m;
-  if(visited[i]) return memo[i];
-  par[i] = true;
-  memo[i] = mint(G[i]);
-  for(const auto &e : g.edges[i]) {
-    memo[i] += zq(g, R, S, G, par, memo, visited, e.to);
+  for(auto &e : scc.edges[i]) {
+    if(isUnbound(sccer, scc, g, zw, tw, znz, tnz, visited, unbounded, e.to, false))
+      return unbounded[i] = true;
   }
-  par[i] = false;
-  visited[i] = true;
-  return memo[i];
+  return unbounded[i] = false;
 }
 
 void solve(int gcj_case_id) {
@@ -349,31 +293,58 @@ int M;cin>>M;VI R(M + 1);VI S(M + 1);times(M,Ri_0){cin>>R[Ri_0];--R[Ri_0];cin>>S
 --S[Ri_0];}VI G(M + 1);times(M,Ri_0){cin>>G[Ri_0];}
 /* </foxy.memo-area> */
 
-  Graph<unit, unit> g(M + 1);
-  R[M] = S[M] = M;
+  Graph<unit> g(M);
 
-  if(R[0]) g.add_dedge(R[0], 0, unit());
-  if(S[0]) g.add_dedge(S[0], 0, unit());
-  if(!R[0] && !S[0]) {
-    g.add_dedge(0, 0, unit());
-    g.add_dedge(0, 0, unit());
+  times(M, i) {
+    g.add_dedge(R[i], i, {});
+    g.add_dedge(S[i], i, {});
   }
 
-  uptil(1, M, i) {
-    g.add_dedge(R[i], i, unit());
-    g.add_dedge(S[i], i, unit());
+  SCCer<unit> sccer(g); sccer.exec();
+  const Graph<unit> &scc = sccer.scc;
+
+  int z = scc.nv(), z0 = sccer.zip[0];
+  VM zw(z);
+  VB nonzero(z), inf_inner(z), inf_outer(z);
+
+  times(M, i) {
+    zw[sccer.zip[i]] += (mint)G[i];
+    nonzero[sccer.zip[i]] = nonzero[sccer.zip[i]] || G[i] > 0;
   }
 
-  VB par(M), st(M), visited(M), visitedp(M);
-  VI memor(M, -1);
-  VM memoq(M);
+  rtimes(z, i) {
+    for(auto &e : scc.edges[i]) {
+      zw[i] += zw[e.to];
+      nonzero[i] = nonzero[i] || nonzero[e.to];
+    }
+    if(nonzero[i]) {
+      if(size(sccer.unzip[i]) >= 2) {
+        inf_outer[i] = true;
+        for(int gi : sccer.unzip[i]) {
+          int c = 0;
+          for(auto &ge : g.edges[gi]) {
+            c += sccer.zip[ge.to] == i;
+          }
+          if(c >= 2) {
+            inf_inner[i] = true;
+            break;
+          }
+        }
+      } else {
+        int gi = sccer.unzip[i][0];
+        for(auto &ge : g.edges[gi]) {
+          if(ge.to == gi) inf_outer[i] = true;
+        }
+      }
+    }
+    for(auto &e : scc.edges[i]) {
+      inf_outer[i] = inf_outer[i] || inf_outer[e.to];
+      inf_inner[i] = inf_inner[i] || inf_outer[e.to];
+    }
+  }
 
-  zp(g, R, S, G, par, st, 0, visitedp);
-  {if(debug)cerr<<"st: "<<(st)ln;}
-  if(zr(g, R, S, G, par, st, memor, 0) == 2) {
+  if(inf_inner[sccer.zip[0]])
     cout << "UNBOUNDED" ln;
-    return;
-  }
-  {if(debug)cerr<<"memor: "<<(memor)ln;}
-  cout << zq(g, R, S, G, par, memoq, visited, 0) ln;
+  else
+    cout << zw[z0] ln;
 }

@@ -1,51 +1,47 @@
 #define GCJ_CASE
 #include "base.hpp"
 #include "graph.hpp"
+#include "graph_scc.hpp"
 //#include "consts.hpp"
 
-void zp(Graph<unit, unit>& g, const VI &R, const VI &S, const VI &G, VB &par, VB &st, int i,
-VB& visited) {
+void dfs(const Graph<unit> &scc, const VM &zw, VM &tw,
+  const VB &znz, VB &tnz,
+  VB &visited, int i
+) {
   if(visited[i]) return;
-  if(par[i]) {
-    st[i] = true;
-    return;
-  }
-  par[i] = true;
-  for(const auto &e : g.edges[i]) {
-    zp(g, R, S, G, par, st, e.to, visited);
-  }
-  par[i] = false;
   visited[i] = true;
+  for(auto &e : scc.edges[i]) {
+    dfs(scc, zw, tw, znz, tnz, visited, e.to);
+    tw[i] += tw[e.to] + zw[e.to];
+    tnz[i] = tnz[i] || tnz[e.to] || znz[e.to];
+  }
 }
 
-/* 0: none, 1: positive, 2: positive loop */
-int zr(Graph<unit, unit>& g, const VI &R, const VI &S, const VI &G, VB &par,
-       const VB &st, VI &memo, int i) {
-  if(par[i]) return 0;
-  if(memo[i] >= 0) return memo[i];
-  par[i] = true;
-  int tm = G[i] != 0;
-  for(const auto &e : g.edges[i]) {
-    amax(tm, zr(g, R, S, G, par, st, memo, e.to));
+bool isUnbound(
+  const SCCer<unit> &sccer,
+  const Graph<unit> &scc, const Graph<unit> &g,
+  const VM &zw, const VM &tw,
+  const VB &znz, const VB &tnz,
+  VB &visited, VB &unbounded, int i,
+  bool init
+) {
+  if(visited[i]) return unbounded[i];
+  if(size(sccer.unzip[i]) >= 2 && (znz[i] || tnz[i])) {
+    if(!init) return unbounded[i] = true;
+    for(int gi : sccer.unzip[i]) {
+      int c = 0;
+      for(auto &ge : g.edges[gi]) {
+        c += sccer.zip[ge.to] == i;
+      }
+      if(c >= 2) return unbounded[i] = true;
+    }
   }
-  par[i] = false;
-  if(tm == 2) return memo[i] = 2;
-  if(tm == 1) return memo[i] = st[i] ? 2 : 1;
-  return memo[i] = 0;
-}
 
-mint zq(Graph<unit, unit>& g, const VI &R, const VI &S, const VI &G, VB &par,
-    VM &memo, VB &visited, int i) {
-  if(par[i]) return 0_m;
-  if(visited[i]) return memo[i];
-  par[i] = true;
-  memo[i] = mint(G[i]);
-  for(const auto &e : g.edges[i]) {
-    memo[i] += zq(g, R, S, G, par, memo, visited, e.to);
+  for(auto &e : scc.edges[i]) {
+    if(isUnbound(sccer, scc, g, zw, tw, znz, tnz, visited, unbounded, e.to, false))
+      return unbounded[i] = true;
   }
-  par[i] = false;
-  visited[i] = true;
-  return memo[i];
+  return unbounded[i] = false;
 }
 
 void solve(int gcj_case_id) {
@@ -55,32 +51,58 @@ int M;cin>>M;VI R(M + 1);VI S(M + 1);times(M,Ri_0){cin>>R[Ri_0];--R[Ri_0];cin>>S
 --S[Ri_0];}VI G(M + 1);times(M,Ri_0){cin>>G[Ri_0];}
 /* </foxy.memo-area> */
 
-  Graph<unit, unit> g(M + 1);
-  R[M] = S[M] = M;
+  Graph<unit> g(M);
 
-  // if(R[0]) g.add_dedge(R[0], 0, unit());
-  // if(S[0]) g.add_dedge(S[0], 0, unit());
-  // if(!R[0] && !S[0]) {
-  //   g.add_dedge(0, 0, unit());
-  //   g.add_dedge(0, 0, unit());
-  // }
-
-  uptil(0, M, i) {
-    g.add_dedge(R[i], i, unit());
-    g.add_dedge(S[i], i, unit());
+  times(M, i) {
+    g.add_dedge(R[i], i, {});
+    g.add_dedge(S[i], i, {});
   }
 
-  VB par(M), st(M), visited(M), visitedp(M);
-  VI memor(M, -1);
-  VM memoq(M);
+  SCCer<unit> sccer(g); sccer.exec();
+  const Graph<unit> &scc = sccer.scc;
 
-  zp(g, R, S, G, par, st, 0, visitedp);
-  if(R[0] || S[0]) st[0] = false;
-  {if(debug)cerr<<"st: "<<(st)ln;}
-  if(zr(g, R, S, G, par, st, memor, 0) == 2) {
+  int z = scc.nv(), z0 = sccer.zip[0];
+  VM zw(z);
+  VB nonzero(z), inf_inner(z), inf_outer(z);
+
+  times(M, i) {
+    zw[sccer.zip[i]] += (mint)G[i];
+    nonzero[sccer.zip[i]] = nonzero[sccer.zip[i]] || G[i] > 0;
+  }
+
+  rtimes(z, i) {
+    for(auto &e : scc.edges[i]) {
+      zw[i] += zw[e.to];
+      nonzero[i] = nonzero[i] || nonzero[e.to];
+    }
+    if(nonzero[i]) {
+      if(size(sccer.unzip[i]) >= 2) {
+        inf_outer[i] = true;
+        for(int gi : sccer.unzip[i]) {
+          int c = 0;
+          for(auto &ge : g.edges[gi]) {
+            c += sccer.zip[ge.to] == i;
+          }
+          if(c >= 2) {
+            inf_inner[i] = true;
+            break;
+          }
+        }
+      } else {
+        int gi = sccer.unzip[i][0];
+        for(auto &ge : g.edges[gi]) {
+          if(ge.to == gi) inf_outer[i] = true;
+        }
+      }
+    }
+    for(auto &e : scc.edges[i]) {
+      inf_outer[i] = inf_outer[i] || inf_outer[e.to];
+      inf_inner[i] = inf_inner[i] || inf_outer[e.to];
+    }
+  }
+
+  if(inf_inner[sccer.zip[0]])
     cout << "UNBOUNDED" ln;
-    return;
-  }
-  {if(debug)cerr<<"memor: "<<(memor)ln;}
-  cout << zq(g, R, S, G, par, memoq, visited, 0) ln;
+  else
+    cout << zw[z0] ln;
 }
