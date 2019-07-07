@@ -36,3 +36,4 @@
 *.err.txt
 *.in.txt
 *.code-workspace
+~*
